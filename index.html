@@ -244,6 +244,30 @@ button { cursor: pointer; }
 .wk-opt[aria-pressed="true"] .r { border: 7px solid var(--acc); }
 .wk-opt b { display: block; font-size: 16px; }
 .wk-opt span.t { font-size: 14px; color: var(--mut); line-height: 1.4; }
+/* Binnenkort: ideeën met voorproefje */
+.idk { display: flex; gap: 14px; align-items: center; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 14px; width: 100%; color: var(--ink); }
+.mini { width: 64px; height: 64px; border-radius: 14px; flex: none; display: block; overflow: hidden; }
+.mini.s { width: 48px; height: 48px; border-radius: 12px; }
+.vpb { background: var(--warn); color: var(--warnTxt); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 600; line-height: 1.4; }
+.tb { touch-action: none; user-select: none; -webkit-user-select: none; }
+.tb.teken { cursor: crosshair; }
+.tb.zet .tbp { cursor: grab; }
+.tbp { position: absolute; transform: translate(-50%, -50%); touch-action: none; }
+.disc.teg { --disc: var(--warn); --discTxt: var(--warnTxt); --discRim: var(--warnTxt); }
+.tbbal { width: 22px; height: 22px; border-radius: 11px; background: #FFFFFF; border: 3px solid #14211B; display: block; }
+.tbh { position: absolute; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 15px; background: #FFFFFF; border: 4px solid var(--warn); z-index: 3; touch-action: none; cursor: grab; box-shadow: 0 2px 4px rgba(0,0,0,.35); }
+.tbbal.sel { box-shadow: 0 0 0 4px var(--warn); }
+.tbrij { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.swatch { width: 34px; height: 34px; border-radius: 17px; border: 2px solid var(--line); padding: 0; flex: none; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--acc); }
+.vpstap { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 0; border-bottom: 1px solid var(--sub); background: none; width: 100%; text-align: left; color: var(--ink); }
+.vpstap:last-child { border-bottom: 0; }
+.st { width: 28px; height: 28px; border-radius: 14px; flex: none; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+.st.ok { background: var(--acc); color: var(--accTxt); }
+.st.bz { background: var(--warn); color: var(--warnTxt); }
+.st.vl { border: 2px dashed var(--line); color: var(--mut); }
+.bars button { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; background: none; border: 0; padding: 0; color: var(--ink); }
+.bars button[aria-pressed="true"] i { background: var(--warn); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(100px + env(safe-area-inset-bottom, 0px)); background: var(--prim); color: var(--primTxt); padding: 10px 16px; border-radius: 99px; font-weight: 700; font-size: 14px; z-index: 50; max-width: calc(100% - 32px); text-align: center; }
 </style>
 
@@ -255,7 +279,7 @@ button { cursor: pointer; }
 /* =================== Testronde: koppeling met de feedbackontvanger =================== */
 var FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbzDOaaVPxfWnG5SDnjqmPUMr-Wq2CvDeWvoVY9TItSDUkNmes99GuoYO0jJoKQXRtQ/exec';               /* Plak hier het adres van de Apps Script web-app (eindigt op /exec) */
 var FEEDBACK_TOKEN = 'odb-test-2026'; /* Moet gelijk zijn aan TOKEN in het Apps Script */
-var APPVERSIE = '0.5-test';
+var APPVERSIE = '0.6-test';
 /* =================== Spelregels (KNVB seizoen 2026/'27) =================== */
 var CAT = {
   O8:  { vorm: '6 tegen 6', veld: 6, helft: 20, form: '1-2-1-2', beleid: 'Rouleren', bal: 'maat 4' },
@@ -590,6 +614,7 @@ function vVandaag() {
       (tekst ? '<span class="note" style="font-size:14px"><span class="dotw"></span>' + tekst + '</span>' : '<span class="note" style="font-size:14px">Iedereen speelt tussen 85% en 115% van zijn eerlijke aandeel.</span>') + '</div></div>';
   }
   if (v) h += '<button type="button" class="prog" data-a="schema" data-id="' + v.id + '"><div class="stack" style="flex:1"><span class="cap">Vorige · ' + esc(kort(v.datum)) + '</span><span style="font-weight:700">' + esc(v.tegen) + ' · ' + (v.thuis ? 'thuis' : 'uit') + '</span><span class="note">' + v.resultaat.length + ' spelers · opgeslagen</span></div><span class="muted" aria-hidden="true" style="font-size:24px">›</span></button>';
+  h += ideeTeaser();
   return h + '</div>' + nav('vandaag');
 }
 
@@ -867,7 +892,7 @@ function vSheet() {
 /* =================== Feedback testronde =================== */
 /* Reacties komen in een wachtrij op dit toestel en gaan naar de Apps Script ontvanger zodra er verbinding is. */
 var FB_TELLERS = ['wedstrijden', 'liveGestart', 'liveTotEind', 'handmatigGeruild', 'herverdeeld', 'naWedIngevuld', 'naWedOverslagen'];
-var FB_SCHERM = { vandaag: 'Vandaag', afmelden: 'Afmelden', schema: 'Schema', live: 'Live', programma: 'Programma', team: 'Team', speler: 'Speler', inzicht: 'Inzicht', instellingen: 'Instellingen' };
+var FB_SCHERM = { vandaag: 'Vandaag', afmelden: 'Afmelden', schema: 'Schema', live: 'Live', programma: 'Programma', team: 'Team', speler: 'Speler', inzicht: 'Inzicht', instellingen: 'Instellingen', binnenkort: 'Binnenkort', idee: 'Voorproefje' };
 function fbLeeg() {
   var t = {}; FB_TELLERS.forEach(function (k) { t[k] = 0; });
   return { code: '', ok: false, url: '', profiel: null, start: vandaagIso(), wachtrij: [], verzonden: 0, eind: false, eindLater: null, naWedUit: false, tellers: t };
@@ -974,7 +999,7 @@ function vFbKaart() {
     '<div class="kv"><span>Testercode</span><b>' + esc(f.code || 'Nog niet ingesteld') + '</b></div>' +
     '<span class="note" id="fb-status">' + esc(fbStatusTekst()) + '</span>' +
     '<div class="row2"><button type="button" class="btn ghost" data-a="fbOpen" data-t="fbMelding">Feedback geven</button><button type="button" class="btn ghost" data-a="fbOpen" data-t="fbEind">Eindevaluatie</button></div>' +
-    '<button type="button" class="link" data-a="wkOpen" style="padding:0">Uitleg opnieuw bekijken</button>' +
+    '<div style="display:flex;gap:18px;flex-wrap:wrap"><button type="button" class="link" data-a="wkOpen" style="padding:0">Uitleg opnieuw bekijken</button><button type="button" class="link" data-a="go" data-s="binnenkort" style="padding:0">Wat komt er binnenkort?</button></div>' +
     '<div class="head" style="align-items:center;border-top:1px solid var(--sub);padding-top:12px"><div class="stack"><span style="font-weight:600">Vragen na elke wedstrijd</span><span class="note">Een paar korte vragen na het opslaan.</span></div>' +
     '<button type="button" class="switch" role="switch" aria-checked="' + !f.naWedUit + '" aria-label="Vragen na elke wedstrijd" data-a="fbNaWedToggle"><span></span></button></div>' +
     '<details style="border-top:1px solid var(--sub);padding-top:12px"><summary class="note" style="cursor:pointer">Koppeling en wachtrij</summary>' +
@@ -1048,6 +1073,7 @@ var FB_ACT = {
     if (!R.fbA.ok) return fout('Zet de toestemming aan om mee te doen.');
     S.fb.code = code; S.fb.ok = true; S.fb.profiel = { wissel: R.fbA.wissel || '', ervaring: R.fbA.ervaring || '' };
     fbItem('start', { wissel: S.fb.profiel.wissel, ervaring: S.fb.profiel.ervaring });
+    if (R.stemNa) { var stem = R.stemNa; R.stemNa = null; R.sheet = null; R.fbA = {}; R.fbNa = null; ideeVerstuur(stem); return; }
     var na = R.fbNa; R.fbNa = null;
     if (na) { R.fbA = {}; R.sheet = { t: na }; render(); fbZichtbaar(); toast('Je doet mee als ' + code); }
     else fbSluit('Je doet mee als ' + code);
@@ -1165,6 +1191,336 @@ var WK_ACT = {
   }, { passive: true });
 })();
 
+/* =================== Binnenkort: ideeën met voorproefje =================== */
+/* Voorproefjes draaien op vaste, verzonnen voorbeelddata in R.vp en raken het team in S nooit.
+   Alleen het aantal keer bekeken en de stem worden bewaard (in S.fb.ideeen). Stemmen gaan via de feedbackwachtrij. */
+var IDEEEN = [
+  { id: 'tactiek', titel: 'Tactiekbord', kort: 'Teken oefeningen en looplijnen op het veld en neem ze mee naar de training.', vp: true, ph: 'Bijvoorbeeld: oefeningen uit Rinus kunnen openen' },
+  { id: 'ouders', titel: 'Ouderweergave', kort: 'Ouders zien de speeltijd en het ontwikkelpad van hun eigen kind.', vp: true, ph: 'Bijvoorbeeld: ouders mogen ook het wisselschema zien' },
+  { id: 'rooster', titel: 'Ouderrooster', kort: 'Fruit, drinken, rijden en wassen eerlijk verdeeld onder de ouders.', vp: false, ph: 'Bijvoorbeeld: ook de kantinedienst erin' }
+];
+var TB_PRESETS = {
+  kaatsen: { naam: 'Kaatsen en doorlopen', uitleg: 'Speel de bal in, krijg hem terug in de loop en schiet af. Na elke beurt draai je door naar de volgende plek.',
+    stukken: [['e', 4, 28, 76, 'wit'], ['e', 7, 52, 56, 'wit'], ['e', '', 64, 40, 'geel'], ['b', '', 33, 72]],
+    pijlen: [['p', 28, 76, 52, 56], ['l', 28, 76, 34, 40], ['p', 52, 56, 34, 40], ['p', 34, 40, 50, 6]] },
+  opbouw: { naam: 'Opbouwen van achteruit', uitleg: 'De keeper speelt in op een verdediger. De middenvelder loopt zich vrij en vraagt de bal. Twee tegenstanders zetten druk.',
+    stukken: [['e', 1, 50, 86, 'wit'], ['e', 2, 22, 66, 'wit'], ['e', 3, 78, 66, 'wit'], ['e', 6, 50, 52, 'wit'], ['e', '', 40, 34, 'geel'], ['e', '', 62, 42, 'geel'], ['b', '', 50, 80]],
+    pijlen: [['p', 50, 86, 22, 66], ['l', 50, 52, 28, 46], ['p', 22, 66, 28, 46]] },
+  partij: { naam: 'Partijvorm 4 tegen 4', uitleg: 'Blauw tegen rood op een klein veld. Wie de bal verovert, speelt meteen vooruit. Na vier minuten wissel je van tegenstander.',
+    stukken: [['e', 1, 50, 84, 'blauw'], ['e', 2, 24, 66, 'blauw'], ['e', 3, 76, 66, 'blauw'], ['e', 4, 50, 56, 'blauw'], ['e', 1, 50, 16, 'rood'], ['e', 2, 24, 34, 'rood'], ['e', 3, 76, 34, 'rood'], ['e', 4, 58, 44, 'rood'], ['b', '', 30, 63]],
+    pijlen: [['p', 24, 66, 50, 56], ['l', 76, 66, 80, 46], ['p', 50, 56, 80, 46]] },
+  leeg: { naam: 'Eigen oefening', uitleg: 'Zet de spelers en de bal neer waar je wilt, geef ze een teamkleur en teken zelf de passes en loopacties.',
+    stukken: [['e', 1, 30, 72, 'wit'], ['e', 2, 50, 72, 'wit'], ['e', 3, 70, 72, 'wit'], ['e', 1, 40, 38, 'geel'], ['e', 2, 60, 38, 'geel'], ['b', '', 50, 60]], pijlen: [] }
+};
+var VP_KIND = { naam: 'Saar', nr: 8, team: 'JO9-3', wil: 'Middenvelder',
+  wed: [['21/9', 'SV Oost', 40, 'Hele wedstrijd. Eerste helft keeper, daarna middenveld.'], ['28/9', 'VV Zuid', 30, 'Begon op de bank, daarna middenveld.'],
+    ['5/10', 'FC West', 35, 'Verdediging en middenveld.'], ['12/10', 'RKC Noord', 40, 'Hele wedstrijd op het middenveld.'], ['19/10', 'SC Midden', 30, 'Begon op de bank, daarna aanval.']],
+  linies: [['Verdediging', 30], ['Middenveld', 50], ['Aanval', 20]],
+  stappen: [['ok', 'Bal aannemen en meenemen', 'Gaat al heel goed, ook als er een tegenstander dichtbij staat.'],
+    ['bz', 'Kijken voordat je de bal krijgt', 'Saar kijkt steeds vaker over haar schouder. Thuis oefenen: tegen een muur spelen en bij elke terugkaats even omkijken.'],
+    ['vl', 'Vrijlopen als je de bal niet hebt', 'Komt na de winterstop aan bod in de trainingen.']]
+};
+var VP_ROOSTER = [['Fruit', 'Papa van Finn', ''], ['Drinken', 'Nog open', 'open'], ['Rijden', '2 van 3 plekken', 'half'], ['Shirts wassen', 'Mama van Noor', ''], ['Spelbegeleider', 'Nog open', 'open']];
+
+function idee(id) { return IDEEEN.filter(function (x) { return x.id === id; })[0]; }
+function ideeStat(id) { fbKlaar(); var l = S.fb.ideeen || (S.fb.ideeen = {}); return l[id] || (l[id] = { stem: false, bekeken: 0 }); }
+function tbLaad(key) {
+  var p = TB_PRESETS[key], tb = R.vp.tb;
+  tb.preset = key; tb.sel = null; tb.kleur = tb.kleur || 'wit';
+  tb.stukken = p.stukken.map(function (s, i) { return { id: 's' + i, t: s[0], nr: s[1], x: s[2], y: s[3], kl: s[4] || 'wit' }; });
+  tb.pijlen = p.pijlen.map(function (a) { return { s: a[0], a: { x: a[1], y: a[2] }, b: { x: a[3], y: a[4] } }; });
+}
+function ideeStart(id) {
+  R.vp = { idee: id, t0: Date.now(), acties: 0, tb: { modus: 'zet' }, ou: { tab: 'speeltijd', bar: null, open: 1, af: {} } };
+  tbLaad('kaatsen');
+  return R.vp;
+}
+
+function ideeMini(id, klein) {
+  var c = 'mini' + (klein ? ' s' : '');
+  if (id === 'tactiek') return '<svg class="' + c + '" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="var(--field)"/><g fill="none" stroke="#FFF" stroke-opacity=".55" stroke-width="1.5"><rect x="6" y="6" width="52" height="52" rx="1"/><line x1="6" y1="32" x2="58" y2="32"/><circle cx="32" cy="32" r="7"/></g><path d="M18 48 L36 36" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/><path d="M18 48 L22 26" stroke="#F2B33D" stroke-width="2.5" stroke-dasharray="4 3" stroke-linecap="round"/><circle cx="18" cy="48" r="5" fill="#FFF" stroke="#14211B" stroke-width="1.5"/><circle cx="38" cy="35" r="5" fill="#FFF" stroke="#14211B" stroke-width="1.5"/><circle cx="29" cy="26" r="5" fill="#F2B33D" stroke="#14211B" stroke-width="1.5"/></svg>';
+  if (id === 'ouders') return '<svg class="' + c + '" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="var(--soft)"/><circle cx="17" cy="17" r="7" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><rect x="28" y="13" width="24" height="4" rx="2" fill="var(--acc)"/><rect x="28" y="20" width="16" height="3" rx="1.5" fill="var(--mid)"/><g fill="var(--acc)"><rect x="10" y="38" width="8" height="16" rx="2"/><rect x="22" y="44" width="8" height="10" rx="2"/><rect x="34" y="40" width="8" height="14" rx="2"/></g><rect x="46" y="44" width="8" height="10" rx="2" fill="var(--warn)"/></svg>';
+  return '<svg class="' + c + '" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="var(--sub)"/><g fill="var(--card)" stroke="var(--line)"><rect x="8" y="10" width="48" height="12" rx="4"/><rect x="8" y="26" width="48" height="12" rx="4"/><rect x="8" y="42" width="48" height="12" rx="4"/></g><g fill="var(--ink)" opacity=".7"><rect x="13" y="14.5" width="16" height="3" rx="1.5"/><rect x="13" y="30.5" width="20" height="3" rx="1.5"/><rect x="13" y="46.5" width="14" height="3" rx="1.5"/></g><circle cx="49" cy="16" r="3.5" fill="var(--acc)"/><circle cx="49" cy="32" r="3.5" fill="var(--warn)"/><circle cx="49" cy="48" r="3.5" fill="var(--acc)"/></svg>';
+}
+function ideeTeaser() {
+  return '<button type="button" class="prog" data-a="go" data-s="binnenkort">' + ideeMini('tactiek', true) +
+    '<div class="stack" style="flex:1;gap:3px"><span class="cap">Binnenkort</span><span style="font-weight:700">Tactiekbord, ouderweergave en meer</span><span class="note">Probeer de voorproefjes en stem mee</span></div><span class="muted" aria-hidden="true" style="font-size:24px">›</span></button>';
+}
+
+function vBinnenkort() {
+  var h = '<div class="scr"><div class="headl">' + terug('vandaag') + '<div class="stack" style="flex:1"><span class="cap">Kijk mee vooruit</span><h1 class="h2">Binnenkort</h1></div>' + fbKnop() + '</div>' +
+    '<p class="note" style="margin:0;font-size:15px">Hier werk ik aan na deze testronde. Probeer de voorproefjes en laat weten wat jij als eerste wilt hebben.</p>';
+  h += IDEEEN.map(function (x) {
+    var s = ideeStat(x.id);
+    return '<button type="button" class="idk" data-a="ideeOpen" data-id="' + x.id + '">' + ideeMini(x.id) +
+      '<span class="stack" style="flex:1;gap:4px"><span style="font-weight:700;font-size:17px">' + x.titel + '</span><span class="note">' + x.kort + '</span>' +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">' + (x.vp ? '<span class="pill p-acc">Probeer het uit</span>' : '<span class="pill p-line">Voorbeeld</span>') +
+      (s.stem ? '<span class="pill p-soft">✓ Jij wilt dit</span>' : '') + '</span></span><span class="muted" aria-hidden="true" style="font-size:24px">›</span></button>';
+  }).join('');
+  h += '<span class="note" style="text-align:center">Je stem gaat met je testercode naar de maker. Er gaan geen gegevens van je team mee.</span>';
+  return h + '</div>' + nav('');
+}
+
+function vIdee() {
+  var x = idee(R.id); if (!x) return vBinnenkort();
+  var vp = R.vp && R.vp.idee === x.id ? R.vp : ideeStart(x.id);
+  var h = '<div class="scr"><div class="headl">' + terug('binnenkort') + '<div class="stack" style="flex:1"><span class="cap">' + (x.vp ? 'Voorproefje' : 'Voorbeeld') + '</span><h1 class="h2" style="font-size:30px;overflow-wrap:anywhere">' + x.titel + '</h1></div></div>' +
+    '<div class="vpb">' + (x.vp ? 'Voorproefje met verzonnen voorbeelddata. Probeer gerust alles, er wordt niets opgeslagen.' : 'Zo zou het eruit kunnen zien. Het klikbare voorproefje volgt in een volgende versie.') + '</div>';
+  h += x.id === 'tactiek' ? vpTactiek(vp) : x.id === 'ouders' ? vpOuders(vp) : vpRooster();
+  return h + ideeStem(x) + '</div>';
+}
+
+function ideeStem(x) {
+  var s = ideeStat(x.id);
+  if (s.stem) return '<div class="card" style="gap:8px"><span class="cap">Jouw mening</span><span style="font-weight:700;font-size:17px">✓ Je stem is binnen</span>' +
+    '<span class="note">Dank je. Hiermee bepaal ik wat er na de test als eerste bij komt.</span><button type="button" class="link" data-a="ideeStem" data-id="' + x.id + '" style="padding:4px 0 0">Toch niet, stem intrekken</button></div>';
+  return '<div class="card"><span class="cap">Jouw mening</span><span style="font-weight:700;font-size:17px">Zou je dit gebruiken?</span>' +
+    '<div class="fld"><label for="f-idee">Wat zou het nog beter maken? (mag leeg)</label><textarea id="f-idee" class="tx" maxlength="400" placeholder="' + esc(x.ph) + '"></textarea></div>' +
+    '<button type="button" class="btn acc" data-a="ideeStem" data-id="' + x.id + '">Dit wil ik</button></div>';
+}
+
+/* ---------- Voorproefje tactiekbord ---------- */
+/* Spelers hebben een teamkleur. In Verplaatsen tik je een speler of pijl aan om hem aan te passen.
+   Een geselecteerde pijl krijgt twee handvatten; pijlen die aan een speler vastzitten bewegen mee. */
+var TB_KLEUR = { wit: ['#FFFFFF', '#14211B', 'Wit'], geel: ['#F2B33D', '#14211B', 'Geel'], blauw: ['#3A7BD5', '#FFFFFF', 'Blauw'], rood: ['#D9483B', '#FFFFFF', 'Rood'] };
+function tbXY(p) { return { x: p.x * 3.5, y: p.y * 3.8 }; }
+function tbEinden(a, b) {
+  var A = tbXY(a), B = tbXY(b), dx = B.x - A.x, dy = B.y - A.y, len = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(16, len * 0.22) / len;
+  return { x1: A.x + dx * k, y1: A.y + dy * k, x2: B.x - dx * k, y2: B.y - dy * k };
+}
+function tbLijn(a, b, s, id, gekozen) {
+  var e = tbEinden(a, b), loop = s === 'l', xy = ' x1="' + e.x1.toFixed(1) + '" y1="' + e.y1.toFixed(1) + '" x2="' + e.x2.toFixed(1) + '" y2="' + e.y2.toFixed(1) + '"';
+  return (gekozen ? '<line' + xy + ' stroke="#FFFFFF" stroke-opacity=".28" stroke-width="13" stroke-linecap="round"/>' : '') +
+    '<line' + (id ? ' id="' + id + '"' : '') + xy + ' stroke="' + (loop ? '#F2B33D' : '#FFFFFF') + '" stroke-width="3.5" stroke-linecap="round"' +
+    (loop ? ' stroke-dasharray="9 7"' : '') + ' marker-end="url(#' + (loop ? 'tbml' : 'tbmp') + ')"/>';
+}
+function tbPijlenSvg(tb) {
+  return tb.pijlen.map(function (p, i) { return tbLijn(p.a, p.b, p.s, null, tb.sel && tb.sel.k === 'pijl' && tb.sel.i === i); }).join('');
+}
+function tbSvg(tb) {
+  var mk = function (id, kl) { return '<marker id="' + id + '" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="' + kl + '"/></marker>'; };
+  return '<svg viewBox="0 0 350 380" aria-hidden="true" style="pointer-events:none"><defs>' + mk('tbmp', '#FFFFFF') + mk('tbml', '#F2B33D') + '</defs>' +
+    '<g id="tb-pijlen">' + tbPijlenSvg(tb) + '</g><line id="tb-nieuw" x1="0" y1="0" x2="0" y2="0" stroke-width="3.5" stroke-linecap="round" opacity="0"/></svg>';
+}
+function tbHandvatten(tb) {
+  if (!tb.sel || tb.sel.k !== 'pijl' || !tb.pijlen[tb.sel.i]) return '';
+  var p = tb.pijlen[tb.sel.i], e = tbEinden(p.a, p.b);
+  return '<div class="tbh" data-h="a" style="left:' + (e.x1 / 3.5).toFixed(2) + '%;top:' + (e.y1 / 3.8).toFixed(2) + '%" aria-hidden="true"></div>' +
+    '<div class="tbh" data-h="b" style="left:' + (e.x2 / 3.5).toFixed(2) + '%;top:' + (e.y2 / 3.8).toFixed(2) + '%" aria-hidden="true"></div>';
+}
+function tbStuk(s, tb) {
+  var gek = tb.sel && tb.sel.k === 'stuk' && tb.sel.id === s.id, k = TB_KLEUR[s.kl] || TB_KLEUR.wit;
+  var inh = s.t === 'b' ? '<span class="tbbal' + (gek ? ' sel' : '') + '"></span>' : '<span class="disc sm' + (gek ? ' sel' : '') + '" style="--disc:' + k[0] + ';--discTxt:' + k[1] + ';--discRim:#14211B">' + esc(s.nr) + '</span>';
+  return '<div class="tbp" data-p="' + s.id + '" style="left:' + s.x + '%;top:' + s.y + '%">' + inh + '</div>';
+}
+function tbVerversPijlen() {
+  var tb = R.vp.tb, g = document.getElementById('tb-pijlen'); if (!g) return;
+  var tmp = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  tmp.innerHTML = '<g id="tb-pijlen">' + tbPijlenSvg(tb) + '</g>';
+  g.parentNode.replaceChild(tmp.firstChild, g);
+  var hs = document.querySelectorAll('#tb [data-h]');
+  if (hs.length && tb.sel && tb.sel.k === 'pijl') {
+    var p = tb.pijlen[tb.sel.i], e = tbEinden(p.a, p.b);
+    hs.forEach(function (h) { var a = h.getAttribute('data-h') === 'a'; h.style.left = ((a ? e.x1 : e.x2) / 3.5) + '%'; h.style.top = ((a ? e.y1 : e.y2) / 3.8) + '%'; });
+  }
+}
+function vpTactiek(vp) {
+  var tb = vp.tb, pr = TB_PRESETS[tb.preset], sel = tb.sel;
+  var seg = function (v, l) { return '<button type="button" data-a="tbModus" data-v="' + v + '" aria-pressed="' + (tb.modus === v) + '">' + l + '</button>'; };
+  var tip = { zet: 'Sleep spelers, de bal of een pijl. Tik iets aan om het aan te passen.', p: 'Trek een lijn van speler naar speler voor een pass.', l: 'Trek een lijn voor de looproute van een speler.' }[tb.modus];
+  var kleuren = function (huidig) { return Object.keys(TB_KLEUR).map(function (k) { return '<button type="button" class="swatch" data-a="tbKleur" data-v="' + k + '" aria-pressed="' + (huidig === k) + '" aria-label="' + TB_KLEUR[k][2] + '" style="background:' + TB_KLEUR[k][0] + '"></button>'; }).join(''); };
+  var ctx, stuk = sel && sel.k === 'stuk' ? tb.stukken.filter(function (s) { return s.id === sel.id; })[0] : null, pijl = sel && sel.k === 'pijl' ? tb.pijlen[sel.i] : null;
+  var weg = '<button type="button" class="btn small ghost" style="border-width:1px;border-color:var(--line)" data-a="tbWeg">Verwijder</button>';
+  if (stuk && stuk.t !== 'b') ctx = '<span class="cap">Speler ' + esc(stuk.nr) + '</span><div class="tbrij"><span class="note">Team</span>' + kleuren(stuk.kl) + '<span style="flex:1"></span>' + weg + '</div>';
+  else if (stuk) ctx = '<span class="cap">De bal</span><span class="note">Sleep de bal naar de plek waar de oefening begint.</span>';
+  else if (pijl) ctx = '<span class="cap">Pijl</span><div class="tbrij"><div class="seg" style="flex:1">' +
+    '<button type="button" data-a="tbSoort" data-v="p" aria-pressed="' + (pijl.s === 'p') + '">Pass</button><button type="button" data-a="tbSoort" data-v="l" aria-pressed="' + (pijl.s === 'l') + '">Loopactie</button></div>' + weg + '</div>' +
+    '<span class="note">Sleep een bolletje om de pijl langer, korter of schuiner te maken. Pak hem in het midden om hem te verplaatsen.</span>';
+  else ctx = '<span class="cap">Speler erbij</span><div class="tbrij"><span class="note">Team</span>' + kleuren(tb.kleur) + '<span style="flex:1"></span><button type="button" class="btn small acc" data-a="tbErbij">+ Speler</button></div>';
+  return '<div class="opts">' + Object.keys(TB_PRESETS).map(function (k) { return '<button type="button" class="opt" style="min-height:38px;font-size:13px" data-a="tbPreset" data-v="' + k + '" aria-pressed="' + (tb.preset === k) + '">' + TB_PRESETS[k].naam + '</button>'; }).join('') + '</div>' +
+    '<div class="seg">' + seg('zet', 'Verplaatsen') + seg('p', 'Pass') + seg('l', 'Loopactie') + '</div>' +
+    '<div class="pitch tb ' + (tb.modus === 'zet' ? 'zet' : 'teken') + '" id="tb" role="application" aria-label="Tactiekbord voorproefje. Sleep spelers en pijlen of teken nieuwe pijlen.">' + VELD_SVG + tbSvg(tb) + tb.stukken.map(function (s) { return tbStuk(s, tb); }).join('') + tbHandvatten(tb) + '</div>' +
+    '<span class="note">' + tip + '</span>' +
+    '<div class="card" style="gap:10px;padding:14px">' + ctx + '</div>' +
+    '<div class="chips note" style="gap:14px"><span><svg width="26" height="8" aria-hidden="true" style="vertical-align:middle"><line x1="1" y1="4" x2="25" y2="4" stroke="var(--ink)" stroke-width="2.5"/></svg> Pass</span>' +
+    '<span><svg width="26" height="8" aria-hidden="true" style="vertical-align:middle"><line x1="1" y1="4" x2="25" y2="4" stroke="var(--warn)" stroke-width="2.5" stroke-dasharray="5 4"/></svg> Loopactie</span><span>Kleur = team</span></div>' +
+    '<div class="card" style="gap:6px"><span class="cap">Oefening</span><span style="font-weight:700">' + pr.naam + '</span><span class="note">' + pr.uitleg + '</span></div>' +
+    '<span class="note">In de echte versie bewaar je oefeningen in je trainingen, deel je ze met andere trainers en zien ouders wat er geoefend wordt.</span>';
+}
+var TB = null;
+function tbPunt(e, bord) { var r = bord.getBoundingClientRect(); return { x: Math.max(3, Math.min(97, (e.clientX - r.left) / r.width * 100)), y: Math.max(3, Math.min(97, (e.clientY - r.top) / r.height * 100)) }; }
+function tbAfst(p, q) { var A = tbXY(p), B = tbXY(q); return Math.sqrt(Math.pow(A.x - B.x, 2) + Math.pow(A.y - B.y, 2)); }
+function tbVang(p) {
+  var best = null, bd = 26;
+  R.vp.tb.stukken.forEach(function (s) { var d = tbAfst(s, p); if (s.t !== 'b' && d < bd) { bd = d; best = { x: s.x, y: s.y }; } });
+  return best || p;
+}
+function tbRaak(p) {
+  var P = tbXY(p), pijlen = R.vp.tb.pijlen;
+  for (var i = pijlen.length - 1; i >= 0; i--) {
+    var e = tbEinden(pijlen[i].a, pijlen[i].b), dx = e.x2 - e.x1, dy = e.y2 - e.y1, l2 = dx * dx + dy * dy || 1;
+    var t = Math.max(0, Math.min(1, ((P.x - e.x1) * dx + (P.y - e.y1) * dy) / l2));
+    if (Math.sqrt(Math.pow(P.x - e.x1 - t * dx, 2) + Math.pow(P.y - e.y1 - t * dy, 2)) < 20) return i;
+  }
+  return -1;
+}
+document.addEventListener('pointerdown', function (e) {
+  var bord = e.target.closest && e.target.closest('#tb'); if (!bord || !R.vp || R.vp.idee !== 'tactiek') return;
+  var tb = R.vp.tb, p = tbPunt(e, bord), h = e.target.closest('[data-h]'), st = e.target.closest('[data-p]');
+  if (h && tb.sel && tb.sel.k === 'pijl') {
+    var pl = tb.pijlen[tb.sel.i], end = h.getAttribute('data-h');
+    TB = { soort: 'eind', i: tb.sel.i, end: end, d: { x: pl[end].x - p.x, y: pl[end].y - p.y }, bord: bord };
+  } else if (st && tb.modus === 'zet') {
+    var s = tb.stukken.filter(function (x) { return x.id === st.getAttribute('data-p'); })[0], links = [];
+    tb.pijlen.forEach(function (pl, i) { ['a', 'b'].forEach(function (k) { if (tbAfst(pl[k], s) < 9) links.push([i, k]); }); });
+    TB = { soort: 'zet', id: s.id, el: st, van: { x: s.x, y: s.y }, start: p, links: links, bord: bord };
+  } else if (tb.modus === 'zet') {
+    var i = tbRaak(p);
+    if (i > -1) { var o = tb.pijlen[i]; TB = { soort: 'pijl', i: i, start: p, a: { x: o.a.x, y: o.a.y }, b: { x: o.b.x, y: o.b.y }, bord: bord }; tb.sel = { k: 'pijl', i: i }; tbVerversPijlen(); }
+    else TB = { soort: 'leeg', bord: bord };
+  } else TB = { soort: 'teken', van: tbVang(p), naar: p, bord: bord };
+  e.preventDefault();
+  try { bord.setPointerCapture(e.pointerId); } catch (x) {}
+});
+document.addEventListener('pointermove', function (e) {
+  if (!TB || TB.soort === 'leeg') return;
+  var tb = R.vp.tb, p = tbPunt(e, TB.bord);
+  if (TB.soort === 'zet') {
+    if (!TB.bewogen && tbAfst(p, TB.start) < 6) return;
+    TB.bewogen = true; TB.p = p;
+    TB.el.style.left = p.x + '%'; TB.el.style.top = p.y + '%';
+    if (TB.links.length) { TB.links.forEach(function (l) { tb.pijlen[l[0]][l[1]] = { x: p.x, y: p.y }; }); tbVerversPijlen(); }
+  } else if (TB.soort === 'pijl') {
+    if (!TB.bewogen && tbAfst(p, TB.start) < 6) return;
+    TB.bewogen = true;
+    var dx = p.x - TB.start.x, dy = p.y - TB.start.y, pl = tb.pijlen[TB.i], kl = function (v) { return Math.max(3, Math.min(97, v)); };
+    pl.a = { x: kl(TB.a.x + dx), y: kl(TB.a.y + dy) }; pl.b = { x: kl(TB.b.x + dx), y: kl(TB.b.y + dy) };
+    tbVerversPijlen();
+  } else if (TB.soort === 'eind') {
+    TB.bewogen = true;
+    tb.pijlen[TB.i][TB.end] = { x: Math.max(3, Math.min(97, p.x + TB.d.x)), y: Math.max(3, Math.min(97, p.y + TB.d.y)) };
+    tbVerversPijlen();
+  } else {
+    TB.naar = p;
+    var oud = document.getElementById('tb-nieuw'); if (!oud) return;
+    var tmp = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    tmp.innerHTML = tbLijn(TB.van, p, tb.modus, 'tb-nieuw');
+    oud.parentNode.replaceChild(tmp.firstChild, oud);
+  }
+});
+function tbEinde() {
+  if (!TB) return; var t = TB, tb = R.vp && R.vp.tb; TB = null; if (!tb) return;
+  if (t.soort === 'zet') {
+    if (t.bewogen) {
+      tb.stukken.forEach(function (s) { if (s.id === t.id) { s.x = Math.round(t.p.x); s.y = Math.round(t.p.y); } });
+      t.links.forEach(function (l) { tb.pijlen[l[0]][l[1]] = { x: Math.round(t.p.x), y: Math.round(t.p.y) }; });
+      R.vp.acties++;
+    }
+    tb.sel = { k: 'stuk', id: t.id };
+  } else if (t.soort === 'pijl') { if (t.bewogen) R.vp.acties++; tb.sel = { k: 'pijl', i: t.i }; }
+  else if (t.soort === 'eind') { var pl = tb.pijlen[t.i]; pl[t.end] = tbVang(pl[t.end]); R.vp.acties++; }
+  else if (t.soort === 'leeg') tb.sel = null;
+  else {
+    var b = tbVang(t.naar);
+    if (tbAfst(b, t.van) > 22) { tb.pijlen.push({ s: tb.modus, a: t.van, b: b }); tb.sel = { k: 'pijl', i: tb.pijlen.length - 1 }; R.vp.acties++; }
+  }
+  render();
+}
+document.addEventListener('pointerup', tbEinde);
+document.addEventListener('pointercancel', function () { if (TB) { TB = null; render(); } });
+
+/* ---------- Voorproefje ouderweergave ---------- */
+function vpOuders(vp) {
+  var o = vp.ou, k = VP_KIND, tab = o.tab;
+  var h = '<div class="card" style="flex-direction:row;align-items:center;gap:14px"><span class="disc">' + k.nr + '</span><div class="stack" style="flex:1"><span class="cap">' + k.team + '</span><span style="font-weight:800;font-size:22px">' + k.naam + '</span></div><span class="pill p-soft">Alleen lezen</span></div>' +
+    '<div class="seg" role="tablist">' + [['speeltijd', 'Speeltijd'], ['groei', 'Ontwikkeling'], ['week', 'Deze week']].map(function (t) { return '<button type="button" role="tab" data-a="ouTab" data-t="' + t[0] + '" aria-selected="' + (tab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div>';
+  if (tab === 'speeltijd') {
+    var tot = 0; k.wed.forEach(function (w) { tot += w[2]; });
+    h += '<div class="tiles"><div class="tile"><span class="cap" style="font-size:11px">Minuten</span><span class="big">' + tot + '</span><span class="note" style="font-size:12px">dit seizoen</span></div>' +
+      '<div class="tile"><span class="cap" style="font-size:11px">Eerlijk</span><span class="big" style="color:var(--acc)">' + Math.round(tot / (35 * k.wed.length) * 100) + '%</span><span class="note" style="font-size:12px">van het aandeel</span></div>' +
+      '<div class="tile"><span class="cap" style="font-size:11px">Wedstr.</span><span class="big">' + k.wed.length + '</span><span class="note" style="font-size:12px">2× bank start</span></div></div>' +
+      '<div class="card"><span class="cap">Minuten per wedstrijd</span><div class="bars" style="grid-template-columns:repeat(' + k.wed.length + ',minmax(0,1fr))">' + k.wed.map(function (w, i) {
+        return '<button type="button" data-a="ouBar" data-i="' + i + '" aria-pressed="' + (o.bar === i) + '" aria-label="' + w[0] + ' tegen ' + w[1] + ', ' + w[2] + ' minuten"><span class="big" style="font-size:13px">' + w[2] + '</span><i style="height:' + Math.round(w[2] / 40 * 80) + 'px"></i></button>';
+      }).join('') + '</div><div style="display:grid;grid-template-columns:repeat(' + k.wed.length + ',minmax(0,1fr));gap:10px;font-size:11px;text-align:center" class="muted">' + k.wed.map(function (w) { return '<span>' + w[0] + '</span>'; }).join('') + '</div>' +
+      (o.bar != null ? '<div class="banner" style="flex-direction:column;align-items:flex-start;gap:2px"><b style="font-size:14px">' + k.wed[o.bar][0] + ' tegen ' + k.wed[o.bar][1] + ' · ' + k.wed[o.bar][2] + ' min</b><span class="note">' + k.wed[o.bar][3] + '</span></div>' : '<span class="note">Tik op een wedstrijd voor details.</span>') + '</div>' +
+      '<span class="note">Alle kinderen in het team spelen ongeveer even veel. Zo zie je dat als ouder ook, zonder dat je de minuten van andere kinderen ziet.</span>';
+  } else if (tab === 'groei') {
+    h += '<div class="head" style="align-items:center"><span class="cap">Ontwikkelpad</span><span class="pill p-soft">Wil leren: ' + k.wil + '</span></div><div class="card tight">' + k.stappen.map(function (s, i) {
+      var open = o.open === i, ic = { ok: '✓', bz: '…', vl: '' }[s[0]], lb = { ok: 'Behaald', bz: 'Mee bezig', vl: 'Volgende stap' }[s[0]];
+      return '<button type="button" class="vpstap" data-a="ouStap" data-i="' + i + '" aria-expanded="' + open + '"><span class="st ' + s[0] + '" aria-hidden="true">' + ic + '</span><span class="stack" style="flex:1;gap:3px"><span style="font-weight:700">' + s[1] + '</span><span class="note" style="font-size:12px">' + lb + '</span>' +
+        (open ? '<span style="font-size:14px;line-height:1.45;margin-top:4px">' + s[2] + '</span>' : '') + '</span><span class="muted" aria-hidden="true">' + (open ? '−' : '+') + '</span></button>';
+    }).join('') + '</div>' +
+      '<div class="card"><span class="cap">Waar speelt ' + k.naam + '?</span><div class="split">' + k.linies.map(function (l, i) { return '<div style="width:' + l[1] + '%;background:' + ['var(--sub)', 'var(--acc)', 'var(--mid)'][i] + ';color:' + (i === 1 ? 'var(--accTxt)' : 'var(--ink)') + '">' + l[1] + '%</div>'; }).join('') + '</div>' +
+      '<div class="chips note" style="gap:12px">' + k.linies.map(function (l, i) { return '<span><span class="dotw" style="background:' + ['var(--sub)', 'var(--acc)', 'var(--mid)'][i] + ';border:1px solid var(--line)"></span>' + l[0] + '</span>'; }).join('') + '</div>' +
+      '<span class="note">Bijgewerkt door de trainer op 19 oktober.</span></div>';
+  } else {
+    var ev = [['tr', 'Training', 'Wo 30 okt · 18:30', 'Thema: kaatsen en doorlopen'], ['wd', 'Wedstrijd', 'Za 2 nov · 09:30', 'Thuis tegen VV Zuid · verzamelen 09:00']];
+    h += ev.map(function (e) {
+      var af = !!o.af[e[0]];
+      return '<div class="card" style="gap:8px"><div class="head" style="align-items:center"><span class="cap">' + e[1] + '</span>' + (af ? '<span class="pill p-warn">Afgemeld</span>' : '<span class="pill p-soft">✓ ' + k.naam + ' is erbij</span>') + '</div>' +
+        '<span style="font-weight:700;font-size:17px">' + e[2] + '</span><span class="note">' + e[3] + '</span>' +
+        (e[0] === 'wd' ? '<span class="pill p-sub" style="align-self:flex-start">Jouw taak: fruit meenemen</span>' : '') +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn small ghost" style="border-width:1px;border-color:var(--line)" data-a="ouAf" data-v="' + e[0] + '">' + (af ? 'Toch aanwezig' : 'Afmelden') + '</button>' +
+        (e[0] === 'tr' ? '<button type="button" class="link" data-a="ideeOpen" data-id="tactiek">Bekijk de oefening ›</button>' : '') + '</div></div>';
+    }).join('') + '<span class="note">Een afmelding komt direct bij de trainer, in het scherm Wie is er niet.</span>';
+  }
+  return h;
+}
+
+/* ---------- Voorbeeld ouderrooster (nog niet klikbaar) ---------- */
+function vpRooster() {
+  return '<div class="card tight"><div class="li" style="min-height:48px;background:var(--sub)"><span class="cap" style="flex:1">Za 2 nov · thuis tegen VV Zuid</span></div>' + VP_ROOSTER.map(function (r) {
+    var rechts = r[2] === 'open' ? '<span class="pill p-warn">' + r[1] + '</span>' : r[2] === 'half' ? '<span class="pill p-sub">' + r[1] + '</span>' : '<span class="note">' + r[1] + '</span>';
+    return '<div class="li" style="min-height:52px"><span style="flex:1;font-weight:700">' + r[0] + '</span>' + rechts + '</div>';
+  }).join('') + '</div>' +
+    '<div class="card" style="gap:8px"><span class="cap">Zo gaat het werken</span><span class="note">Ouders kiezen zelf een taak, met één tik.</span>' +
+    '<span class="note">Kun je niet? Zet je taak te ruil, dan neemt een andere ouder hem over.</span><span class="note">De app houdt bij wie wat al deed, zodat het eerlijk rondgaat. Net als de speeltijd.</span></div>';
+}
+
+function ideeVerstuur(item) {
+  ideeStat(item.idee).stem = item.stem;
+  fbItem('idee', item, { scherm: 'Binnenkort' });
+  render(); toast(item.stem ? 'Stem verstuurd, dank je' : 'Stem ingetrokken');
+}
+var IDEE_ACT = {
+  ideeOpen: function (d) { var s = ideeStat(d.id); s.bekeken++; bewaar(); ideeStart(d.id); R.stemNa = null; go('idee', d.id); },
+  ideeStem: function (d) {
+    var s = ideeStat(d.id), nieuw = !s.stem, vp = R.vp && R.vp.idee === d.id ? R.vp : null;
+    var item = { idee: d.id, stem: nieuw, tekst: nieuw ? val('f-idee') : '', bekeken: s.bekeken, interacties: vp ? vp.acties : 0, seconden: vp ? Math.round((Date.now() - vp.t0) / 1000) : 0 };
+    fbKlaar();
+    if (!S.fb.ok) { R.stemNa = item; R.fbScherm = 'idee'; fbOpen(''); return; }
+    ideeVerstuur(item);
+  },
+  tbModus: function (d) { if (!R.vp) return; R.vp.tb.modus = d.v; render(); },
+  tbPreset: function (d) { if (!R.vp) return; tbLaad(d.v); R.vp.acties++; render(); },
+  tbKleur: function (d) {
+    var tb = R.vp.tb; tb.kleur = d.v;
+    if (tb.sel && tb.sel.k === 'stuk') tb.stukken.forEach(function (s) { if (s.id === tb.sel.id && s.t !== 'b') s.kl = d.v; });
+    R.vp.acties++; render();
+  },
+  tbErbij: function () {
+    var tb = R.vp.tb, spelers = tb.stukken.filter(function (s) { return s.t !== 'b'; });
+    if (spelers.length >= 16) return toast('Maximaal 16 spelers op het bord');
+    var nrs = spelers.filter(function (s) { return s.kl === tb.kleur; }).map(function (s) { return Number(s.nr) || 0; }), nr = 1;
+    while (nrs.indexOf(nr) > -1) nr++;
+    var id = 'n' + Date.now();
+    var plek = [[50, 50], [12, 50], [88, 50], [35, 50], [65, 50], [12, 88], [88, 88], [12, 12], [88, 12]].filter(function (c) { return tb.stukken.every(function (s) { return tbAfst(s, { x: c[0], y: c[1] }) > 40; }); })[0] || [50, 50];
+    tb.stukken.push({ id: id, t: 'e', nr: nr, x: plek[0], y: plek[1], kl: tb.kleur }); tb.sel = { k: 'stuk', id: id };
+    R.vp.acties++; render(); toast('Sleep de nieuwe speler naar zijn plek');
+  },
+  tbWeg: function () {
+    var tb = R.vp.tb, sel = tb.sel; if (!sel) return;
+    if (sel.k === 'pijl') tb.pijlen.splice(sel.i, 1);
+    else tb.stukken = tb.stukken.filter(function (s) { return s.id !== sel.id || s.t === 'b'; });
+    tb.sel = null; R.vp.acties++; render();
+  },
+  tbSoort: function (d) { var tb = R.vp.tb; if (tb.sel && tb.sel.k === 'pijl') { tb.pijlen[tb.sel.i].s = d.v; R.vp.acties++; render(); } },
+  ouTab: function (d) { R.vp.ou.tab = d.t; R.vp.acties++; render(); },
+  ouBar: function (d) { var i = Number(d.i); R.vp.ou.bar = R.vp.ou.bar === i ? null : i; R.vp.acties++; render(); },
+  ouStap: function (d) { var i = Number(d.i); R.vp.ou.open = R.vp.ou.open === i ? null : i; R.vp.acties++; render(); },
+  ouAf: function (d) { var a = R.vp.ou.af; a[d.v] = !a[d.v]; R.vp.acties++; render(); toast(a[d.v] ? 'Afgemeld. De trainer ziet het direct' : 'Weer aangemeld'); }
+};
+
 /* =================== Render en acties =================== */
 var timer = null, wakeLock = null;
 function pasThemaToe() {
@@ -1173,7 +1529,7 @@ function pasThemaToe() {
 }
 function render() {
   pasThemaToe();
-  var V = { vandaag: vVandaag, afmelden: vAfmelden, schema: vSchema, live: vLive, programma: vProgramma, team: vTeam, speler: vSpeler, inzicht: vInzicht, instellingen: vInstellingen }[R.s] || vVandaag;
+  var V = { vandaag: vVandaag, afmelden: vAfmelden, schema: vSchema, live: vLive, programma: vProgramma, team: vTeam, speler: vSpeler, inzicht: vInzicht, instellingen: vInstellingen, binnenkort: vBinnenkort, idee: vIdee }[R.s] || vVandaag;
   var scroll = window.scrollY, zelfde = render.laatste === R.s + R.id;
   var wk = R.welkom != null;
   document.getElementById('app').innerHTML = wk ? vWelkom() : V() + vSheet();
@@ -1232,7 +1588,7 @@ var ACT = {
   vorm: function (d) { S.team.wisselvorm = d.v; bewaar(); render(); },
   wis: function () { if (R.bevestig !== 'wis') { R.bevestig = 'wis'; return render(); } var fb = S.fb; S = leegState(); S.fb = fb || fbLeeg(); bewaar(); R.bevestig = null; go('team'); toast('Alles gewist'); },
   sheet: function (d) { R.sheet = { t: d.t, id: d.id || null }; R.bevestig = null; render(); var f = document.querySelector('.sheet input:not([readonly]), .sheet textarea'); if (f && d.t !== 'backup') f.focus(); },
-  sluit: function () { R.sheet = null; R.bevestig = null; render(); },
+  sluit: function () { R.sheet = null; R.bevestig = null; R.stemNa = null; render(); },
   sluitVeil: function (d, el, e) { if (e.target === el) ACT.sluit(); },
   bewaarSpeler: function () {
     var n = val('f-naam'), nr = val('f-nr');
@@ -1287,6 +1643,7 @@ var ACT = {
 };
 Object.keys(FB_ACT).forEach(function (k) { ACT[k] = FB_ACT[k]; });
 Object.keys(WK_ACT).forEach(function (k) { ACT[k] = WK_ACT[k]; });
+Object.keys(IDEE_ACT).forEach(function (k) { ACT[k] = IDEE_ACT[k]; });
 document.addEventListener('click', function (e) {
   var el = e.target.closest('[data-a]'); if (!el || el.disabled) return;
   var f = ACT[el.dataset.a]; if (!f) return;
